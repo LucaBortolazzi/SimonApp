@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     ){
                         composable("Gameplay"){
                             GameplayScreen(
-                                onCancelClicked = {navController.navigate("GameHistory")}
+                                onEndGameClicked = {navController.navigate("GameHistory")}
                             )
                         }
 

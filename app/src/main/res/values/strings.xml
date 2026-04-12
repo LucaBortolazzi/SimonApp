@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SimonApp</string>
+    <string name="btn_clear">Clear</string>
+    <string name="btn_endGame">End game</string>
 </resources>

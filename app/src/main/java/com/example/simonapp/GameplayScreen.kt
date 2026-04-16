@@ -1,10 +1,7 @@
 package com.example.simonapp
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,14 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.w3c.dom.Text
-
-
-/*
-* guarda font
-* dimensione bottoni sotto
-* linee separatrici tra elementi
-*/
 
 val colorList = listOf(
     'R' to Color.Red,
@@ -49,6 +38,86 @@ val colorList = listOf(
     'Y' to Color.Yellow,
     'C' to Color.Cyan
 )
+
+@Composable
+fun GameplayScreen(
+    onEndGameClicked: (List<Char>) -> Unit,
+    modifier: Modifier = Modifier
+){
+    //ritorna configurazione corrente
+    val orientation = LocalConfiguration.current.orientation
+
+    //sequenza sopravvive a cambi di configurazione
+    var sequence by rememberSaveable { mutableStateOf(listOf<Char>()) }
+
+    //layout in base a orientazione corrente
+    if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+
+        //LANDSCAPE
+
+        Row(modifier = modifier.fillMaxSize()) {
+            ColorsGrid(
+                //aggiungo alla sequenza la lettera corrispondente al colore premuto
+                onButtonPressed = { letter -> sequence = sequence + letter },
+                modifier = Modifier
+                    .weight(1.5f)   //60% dello schermo
+                    .fillMaxHeight()
+            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)     //40% rimanente dello schermo
+                    .fillMaxHeight()
+                    .padding(8.dp)
+            ){
+                //margine superiore
+                Spacer(modifier = Modifier.height(40.dp))
+
+                SequenceLetter(
+                    sequence = sequence,
+                    modifier = Modifier.weight(1f)
+                )
+
+                ButtonsRow(
+                    sequence = sequence,
+                    onClearClicked = { sequence = emptyList() },
+                    onEndGameClicked = {
+                        onEndGameClicked(sequence)      //sequenza mandata a GameHistoryScreen
+                        sequence = emptyList()          //azzera sequenza
+                    }
+                )
+            }
+        }
+    }
+    else{
+
+        //PORTRAIT
+
+        Column(modifier = modifier.fillMaxSize()) {
+            ColorsGrid(
+                onButtonPressed = { letter -> sequence = sequence + letter },
+                modifier = Modifier
+                    .weight(2f)     //80% schermo
+                    .fillMaxWidth()
+            )
+
+            SequenceLetter(
+                sequence = sequence,
+                modifier = Modifier.weight(0.4f)    //20% schermo
+            )
+
+            ButtonsRow(
+                sequence = sequence,
+                onClearClicked = { sequence = emptyList() },
+                onEndGameClicked = {
+                    onEndGameClicked(sequence)      //sequenza mandata a GameHistoryScreen
+                    sequence = emptyList()          //azzera sequenza
+                }
+            )
+        }
+    }
+}
+
+
 
 @Composable
 fun ColorsGrid(
@@ -135,84 +204,6 @@ fun ButtonsRow(
         }
         Button(onClick = { onEndGameClicked (sequence)} ) {
             Text(text = stringResource(R.string.btn_endGame))
-        }
-    }
-}
-
-@Composable
-fun GameplayScreen(
-    onEndGameClicked: (List<Char>) -> Unit,
-    modifier: Modifier = Modifier
-){
-    //ritorna configurazione corrente
-    val orientation = LocalConfiguration.current.orientation
-
-    //sequenza sopravvive a cambi di configurazione
-    var sequence by rememberSaveable { mutableStateOf(listOf<Char>()) }
-
-    //layout in base a orientazione corrente
-    if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-
-        //LANDSCAPE
-
-        Row(modifier = modifier.fillMaxSize()) {
-            ColorsGrid(
-                //aggiungo alla sequenza la lettera corrispondente al colore premuto
-                onButtonPressed = { letter -> sequence = sequence + letter },
-                modifier = Modifier
-                    .weight(1.5f)   //60% dello schermo
-                    .fillMaxHeight()
-            )
-            Column(
-                modifier = Modifier
-                    .weight(1f)     //40% rimanente dello schermo
-                    .fillMaxHeight()
-                    .padding(8.dp)
-            ){
-                //margine superiore
-                Spacer(modifier = Modifier.height(40.dp))
-
-                SequenceLetter(
-                    sequence = sequence,
-                    modifier = Modifier.weight(1f)
-                )
-
-                ButtonsRow(
-                    sequence = sequence,
-                    onClearClicked = { sequence = emptyList() },
-                    onEndGameClicked = {
-                        onEndGameClicked(sequence)      //sequenza mandata a GameHistoryScreen
-                        sequence = emptyList()          //azzera sequenza
-                    }
-                )
-            }
-        }
-    }
-    else{
-
-        //PORTRAIT
-
-        Column(modifier = modifier.fillMaxSize()) {
-            ColorsGrid(
-                onButtonPressed = { letter -> sequence = sequence + letter },
-                modifier = Modifier
-                    .weight(2f)     //80% schermo
-                    .fillMaxWidth()
-            )
-
-            SequenceLetter(
-                sequence = sequence,
-                modifier = Modifier.weight(0.4f)    //20% schermo
-            )
-
-            ButtonsRow(
-                sequence = sequence,
-                onClearClicked = { sequence = emptyList() },
-                onEndGameClicked = {
-                    onEndGameClicked(sequence)      //sequenza mandata a GameHistoryScreen
-                    sequence = emptyList()          //azzera sequenza
-                }
-            )
         }
     }
 }

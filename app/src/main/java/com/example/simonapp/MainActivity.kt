@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,13 +18,7 @@ import com.example.simonapp.ui.theme.SimonAppTheme
 
 
 /*
-* guarda font
-* dimensione bottoni sotto
-* linee separatrici tra elementi
 * icona
-* lingue/layout
-* elimina errori grammaticali
-* preview
 */
 
 class MainActivity : ComponentActivity() {
@@ -47,13 +42,14 @@ class MainActivity : ComponentActivity() {
                                 onEndGameClicked = { completedSequence ->
                                     finishedGames = finishedGames + listOf(completedSequence)
                                     navController.navigate("GameHistory")}
+                                    //viene passata la sequenza dopo che viene premuto "fine partia"
+                                    //sequenza accodata alle precedenti
                             )
                         }
 
                         composable("GameHistory"){
                             GameHistoryScreen(finishedGames = finishedGames)
                         }
-
                     }
                 }
             }
@@ -61,10 +57,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-/*
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    SimonAppTheme {}
+fun GameplayScreenPreview() {
+    SimonAppTheme {
+        GameplayScreen(
+            onEndGameClicked = {}   // lambda vuota per la preview
+        )
+    }
 }
- */

@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,10 +45,9 @@ fun SequenceHistory(
         modifier = modifier.padding(8.dp),
         verticalArrangement = Arrangement.Center
     ){
-        //assegna indice e valore ad ogni sequenza
-        itemsIndexed(finishedGames){ index, game ->
+        //itero su partite concluse, ignoro indice
+        itemsIndexed(finishedGames){ _, game ->
             SequenceItems(
-                index = index +1,
                 game = game
             )
 
@@ -59,7 +60,6 @@ fun SequenceHistory(
 @Composable
 //stringa/sequenza precedente
 fun SequenceItems(
-    index: Int,
     game: List<Char>,
     modifier: Modifier = Modifier
 ){
@@ -72,6 +72,7 @@ fun SequenceItems(
         Text(
             text = game.size.toString(),
             fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )
@@ -79,6 +80,7 @@ fun SequenceItems(
         Text(
             text = game.toString(),
             fontSize = 16.sp,
+            fontStyle = FontStyle.Italic,
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(1f),
             maxLines = 1,                       //massimo 1 riga per sequenza

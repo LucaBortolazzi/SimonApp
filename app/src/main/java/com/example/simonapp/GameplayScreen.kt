@@ -1,6 +1,7 @@
 package com.example.simonapp
 
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,6 +80,12 @@ fun GameplayScreen(
                     modifier = Modifier.weight(1f)
                 )
 
+                //linea separatrice
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = Color.LightGray
+                )
+
                 ButtonsRow(
                     sequence = sequence,
                     onClearClicked = { sequence = emptyList() },
@@ -105,6 +114,11 @@ fun GameplayScreen(
                 modifier = Modifier.weight(0.4f)    //20% schermo
             )
 
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Color.LightGray
+            )
+
             ButtonsRow(
                 sequence = sequence,
                 onClearClicked = { sequence = emptyList() },
@@ -118,7 +132,7 @@ fun GameplayScreen(
 }
 
 
-
+//matrice di bottoni colorati
 @Composable
 fun ColorsGrid(
     onButtonPressed: (Char) -> Unit,    //comunica quale lettera premuta
@@ -139,6 +153,7 @@ fun ColorsGrid(
     }
 }
 
+//bottoni colorati
 @Composable
 fun ColoredButton(
     color: Color,
@@ -154,7 +169,8 @@ fun ColoredButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, Color.LightGray),
+        shape = RoundedCornerShape(25.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(6.dp)
@@ -162,13 +178,15 @@ fun ColoredButton(
     ){
         Text(
             text = letter.toString(),   //serve string per Text
-            fontSize = 16.sp,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
             color = Color.Gray,
             textAlign = TextAlign.Center
         )
     }
 }
 
+//sequenza di lettere corrispondenti a bottone premuto
 @Composable
 fun SequenceLetter(
     sequence: List<Char>,
@@ -185,6 +203,7 @@ fun SequenceLetter(
     )
 }
 
+//2 pulsanti per gestione sequenze
 @Composable
 fun ButtonsRow(
     onClearClicked: () -> Unit,

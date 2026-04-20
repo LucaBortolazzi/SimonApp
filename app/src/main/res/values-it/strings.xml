@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SimonApp</string>
+    <string name="btn_clear">Cancella</string>
+    <string name="btn_endGame">Fine partita</string>
+</resources>

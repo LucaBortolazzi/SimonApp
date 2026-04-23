@@ -17,10 +17,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.simonapp.ui.theme.SimonAppTheme
 
 
-/*
-* icona
-*/
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +58,7 @@ class MainActivity : ComponentActivity() {
 fun GameplayScreenPreview() {
     SimonAppTheme {
         GameplayScreen(
-            onEndGameClicked = {}   // lambda vuota per la preview
+            onEndGameClicked = {}
         )
     }
 }

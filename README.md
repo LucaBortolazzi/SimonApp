@@ -38,4 +38,8 @@ Prototipo del gioco **Simon** realizzato in Android con Jetpack Compose.
 
 ---
 
+## Note
 
+Ho notato solo dopo parecchi commit di aver utilizzato un account 
+GitHub diverso da quello usato nel commit iniziale. Entrambi sono
+miei account: uno privato e uno istituzionale.

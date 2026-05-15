@@ -38,8 +38,4 @@ Prototipo del gioco **Simon** realizzato in Android con Jetpack Compose.
 
 ---
 
-## NOTE
-
-- Per risolvere problemi di compatibilità per le dipendenze di room ho abbassato la versione di AGP a versione 8.7.3
-
 

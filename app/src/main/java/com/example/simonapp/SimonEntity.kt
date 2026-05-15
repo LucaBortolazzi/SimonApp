@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 class SimonEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "sequence") val sequence: String,
-    @ColumnInfo(name = "error") val error: Int
+    @ColumnInfo(name = "errorIndex") val errorIndex: Int    //indice del primo errore nella sequenza
 )

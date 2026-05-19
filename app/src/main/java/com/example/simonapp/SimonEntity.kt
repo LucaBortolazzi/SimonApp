@@ -8,5 +8,6 @@ import androidx.room.PrimaryKey
 class SimonEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "sequence") val sequence: String,
-    @ColumnInfo(name = "errorIndex") val errorIndex: Int    //indice del primo errore nella sequenza
+    @ColumnInfo(name = "errorIndex") val errorIndex: Int,   //indice del primo errore nella sequenza
+    @ColumnInfo(name = "maxCorrectLength") val maxCorrectLength: Int
 )

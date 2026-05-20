@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -18,6 +19,9 @@ import com.example.simonapp.ui.theme.SimonAppTheme
 
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: SimonViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -25,26 +29,35 @@ class MainActivity : ComponentActivity() {
         setContent {
             SimonAppTheme {
                 val navController = rememberNavController()     //utilizzo navigation
-                var finishedGames by rememberSaveable { mutableStateOf(listOf<List<Char>>()) }
+                //_______________________________________var finishedGames by rememberSaveable { mutableStateOf(listOf<List<Char>>()) }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = "Gameplay",
+                        startDestination = "GameHistory",
                         modifier = Modifier.padding(innerPadding)
                     ){
-                        composable("Gameplay"){
-                            GameplayScreen(
-                                onEndGameClicked = { completedSequence ->
-                                    finishedGames = finishedGames + listOf(completedSequence)
-                                    navController.navigate("GameHistory")}
-                                    //viene passata la sequenza dopo che viene premuto "fine partia"
-                                    //sequenza accodata alle precedenti
+                        composable("GameHistory"){
+                            GameHistoryScreen(
+                                viewModel = viewModel,
+                                onStartGameClicked = { navController.navigate("Gameplay") },
+                                //da aggiungere con game detail
                             )
                         }
 
-                        composable("GameHistory"){
-                            GameHistoryScreen(finishedGames = finishedGames)
+                        composable("Gameplay"){
+                            GameplayScreen(
+                                viewModel = viewModel,
+                                onNavigateBack = { navController.navigate("GameHistory") }
+                            )
+                        }
+
+                        composable("GameDetail/{gameId}"){  backStackEntry ->
+                            val gameId = backStackEntry.arguments?.getString("gameId")?.toIntOrNull()
+                            GameDetailScreen(
+                                viewModel = viewModel,
+                                gameId = gameId
+                            )
                         }
                     }
                 }

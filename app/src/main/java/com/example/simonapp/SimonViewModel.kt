@@ -22,31 +22,35 @@ enum class GameState {
     FINISHED        //partita terminata normalmente (fine partita premuto)
 }
 
+//utilizzo context Application di AndroidViewModel
 class SimonViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = SimonRepository(
         SimonDatabase.getDatabase(application).simonDao()
     )
 
-    //lista partite osservabile da GameHistoryScreen
+    //lista partite osservabile che si aggiorna ad ogni cambio del DB
+    //.stateIn() per converitre in stateFlow
     val allGames: StateFlow<List<SimonEntity>> = repository.allGames
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
 
-    //stati del gioco:
 
+    //_variabile: modificabile solo da viewModel
+    // variabile: solo leggibile da UI
+    //stati del gioco:
     private val _gameState = MutableStateFlow(GameState.IDLE)
     val gameState: StateFlow<GameState> = _gameState
 
-    //sequenza generata dal computer (lista indici)
+    //sequenza generata dal computer (lista indici che rappresentano un colore)
     private val _computerSequence = MutableStateFlow<List<Int>>(emptyList())
     val computerSequence: StateFlow<List<Int>> = _computerSequence
 
-    //sequenza premuta dal giocatore
+    //sequenza premuta dal giocatore (stessa struttura di computerSequence)
     private val _playerSequence = MutableStateFlow<List<Int>>(emptyList())
     val playerSequence: StateFlow<List<Int>> = _playerSequence
 
-    //indice bottone illuminato (default: -1)
+    //indice bottone che si deve illuminare (default: -1)
     private val _activeButton = MutableStateFlow<Int>(-1)
     val activeButton: StateFlow<Int> = _activeButton
 
@@ -57,7 +61,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
     //lunghezza massima sequenza corrretta
     private var maxCorrectLength = 0
 
-    //azioni computer: pausa/riprendere/cancellare
+    //riferimento coroutine di sequenza del computer
     private var playbackJob: Job? = null
 
     //indice per pausa

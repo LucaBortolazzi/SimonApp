@@ -16,52 +16,79 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+//colori con indice intero invece di Char per coerenza con ViewModel
 val colorList = listOf(
-    'R' to Color.Red,
-    'G' to Color.Green,
-    'B' to Color.Blue,
-    'M' to Color.Magenta,
-    'Y' to Color.Yellow,
-    'C' to Color.Cyan
+    0 to Color.Red,
+    1 to Color.Green,
+    2 to Color.Blue,
+    3 to Color.Magenta,
+    4 to Color.Yellow,
+    5 to Color.Cyan
 )
+
+//lettere corrispondenti agli indici
+val colorLabels = listOf("R", "G", "B", "M", "Y", "C")
 
 @Composable
 fun GameplayScreen(
-    onEndGameClicked: (List<Char>) -> Unit,
+    viewModel: SimonViewModel,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ){
+    //osserva gli stati dal ViewModel
+    val gameState by viewModel.gameState.collectAsState()
+    val playerSequence by viewModel.playerSequence.collectAsState()
+    val activeButton by viewModel.activeButton.collectAsState()
+
     //ritorna configurazione corrente
     val orientation = LocalConfiguration.current.orientation
 
-    //sequenza sopravvive a cambi di configurazione
-    var sequence by rememberSaveable { mutableStateOf(listOf<Char>()) }
+    //errore quando il giocatore sbaglia
+    if (gameState == GameState.ERROR) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text("Errore!") },
+            text = { Text("Hai premuto il colore sbagliato!") },
+            confirmButton = {
+                TextButton(onClick = { onNavigateBack() }) {
+                    Text("Torna alla lista")
+                }
+            }
+        )
+    }
 
     //layout in base a orientazione corrente
     if(orientation == Configuration.ORIENTATION_LANDSCAPE){
 
-        //LANDSCAPE
+
+
+        //______________________________________LANDSCAPE_______________________________________
 
         Row(modifier = modifier.fillMaxSize()) {
             ColorsGrid(
+                activeButton = activeButton,
                 //aggiungo alla sequenza la lettera corrispondente al colore premuto
-                onButtonPressed = { letter -> sequence = sequence + letter },
+                onButtonPressed = { index -> viewModel.onPlayerInput(index) },
+                //bottoni premibili solo durante turno del giocatore
+                enabled = gameState == GameState.PLAYER_TURN,
                 modifier = Modifier
                     .weight(1.5f)   //60% dello schermo
                     .fillMaxHeight()
@@ -76,7 +103,8 @@ fun GameplayScreen(
                 Spacer(modifier = Modifier.height(40.dp))
 
                 SequenceLetter(
-                    sequence = sequence,
+                    gameState = gameState,
+                    playerSequence = playerSequence,
                     modifier = Modifier.weight(1f)
                 )
 
@@ -87,11 +115,12 @@ fun GameplayScreen(
                 )
 
                 ButtonsRow(
-                    sequence = sequence,
-                    onClearClicked = { sequence = emptyList() },
+                    gameState = gameState,
+                    onStartClicked = { viewModel.startGame() },
+                    onPauseResumeClicked = { viewModel.pauseResume() },
                     onEndGameClicked = {
-                        onEndGameClicked(sequence)      //sequenza mandata a GameHistoryScreen
-                        sequence = emptyList()          //azzera sequenza
+                        viewModel.endGame()
+                        onNavigateBack()
                     }
                 )
             }
@@ -99,18 +128,22 @@ fun GameplayScreen(
     }
     else{
 
-        //PORTRAIT
+
+        //________________________________PORTRAIT___________________________________
 
         Column(modifier = modifier.fillMaxSize()) {
             ColorsGrid(
-                onButtonPressed = { letter -> sequence = sequence + letter },
+                activeButton = activeButton,
+                onButtonPressed = { index -> viewModel.onPlayerInput(index) },
+                enabled = gameState == GameState.PLAYER_TURN,
                 modifier = Modifier
                     .weight(2f)     //80% schermo
                     .fillMaxWidth()
             )
 
             SequenceLetter(
-                sequence = sequence,
+                gameState = gameState,
+                playerSequence = playerSequence,
                 modifier = Modifier.weight(0.4f)    //20% schermo
             )
 
@@ -120,35 +153,38 @@ fun GameplayScreen(
             )
 
             ButtonsRow(
-                sequence = sequence,
-                onClearClicked = { sequence = emptyList() },
+                gameState = gameState,
+                onStartClicked = { viewModel.startGame() },
+                onPauseResumeClicked = { viewModel.pauseResume() },
                 onEndGameClicked = {
-                    onEndGameClicked(sequence)      //sequenza mandata a GameHistoryScreen
-                    sequence = emptyList()          //azzera sequenza
+                    viewModel.endGame()
+                    onNavigateBack()
                 }
             )
         }
     }
 }
 
-
 //matrice di bottoni colorati
 @Composable
 fun ColorsGrid(
-    onButtonPressed: (Char) -> Unit,    //comunica quale lettera premuta
+    activeButton: Int,
+    onButtonPressed: (Int) -> Unit,    //comunica quale indice premuto
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ){
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),   //6 elementi
         modifier = modifier.fillMaxSize()
     ){
-        items(colorList){ (letter, color) ->    //pair lettera, colore
+        items(colorList){ (index, color) ->    //pair indice, colore
             ColoredButton(
-                letter = letter,
+                index = index,
                 color = color,
-                onClick = { onButtonPressed(letter) }
+                isActive = activeButton == index,
+                onClick = { onButtonPressed(index) },
+                enabled = enabled
             )
-
         }
     }
 }
@@ -157,7 +193,9 @@ fun ColorsGrid(
 @Composable
 fun ColoredButton(
     color: Color,
-    letter: Char,
+    index: Int,
+    isActive: Boolean,
+    enabled: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ){
@@ -166,9 +204,16 @@ fun ColoredButton(
     //gestione dimensione bottoni in base ad orientazione
     val ratio = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 2.5f else 1f
 
+    //feedback visivo: colore pieno se attivo, trasparente altrimenti
+    val displayColor = if (isActive) color else color.copy(alpha = 0.4f)
+
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = color),
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = displayColor,
+            disabledContainerColor = displayColor   //mantieni colore anche se disabilitato
+        ),
         border = BorderStroke(1.dp, Color.LightGray),
         shape = RoundedCornerShape(25.dp),
         modifier = modifier
@@ -177,7 +222,7 @@ fun ColoredButton(
             .aspectRatio(ratio)
     ){
         Text(
-            text = letter.toString(),   //serve string per Text
+            text = colorLabels[index],   //serve string per Text
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Gray,
@@ -189,12 +234,20 @@ fun ColoredButton(
 //sequenza di lettere corrispondenti a bottone premuto
 @Composable
 fun SequenceLetter(
-    sequence: List<Char>,
+    gameState: GameState,
+    playerSequence: List<Int>,
     modifier: Modifier = Modifier
 ) {
+    //area vuota durante turno computer
+    //sequenza premuta visible durante turno guocatore
+    val text = when (gameState) {
+        GameState.COMPUTER_TURN, GameState.PAUSED -> ""
+        else -> playerSequence.joinToString(", ") { colorLabels[it] }
+    }
+
     Text(
         //trasforma elementi di Lista in stringa con virgola che separa
-        text = sequence.joinToString(", "),
+        text = text,
         fontSize = 16.sp,
         textAlign = TextAlign.Center,
         modifier = modifier
@@ -203,12 +256,13 @@ fun SequenceLetter(
     )
 }
 
-//2 pulsanti per gestione sequenze
+//3 pulsanti per gestione partita
 @Composable
 fun ButtonsRow(
-    onClearClicked: () -> Unit,
-    onEndGameClicked: (List<Char>) -> Unit,
-    sequence: List<Char>,
+    gameState: GameState,
+    onStartClicked: () -> Unit,
+    onPauseResumeClicked: () -> Unit,
+    onEndGameClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -218,11 +272,30 @@ fun ButtonsRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(onClick = onClearClicked) {
-            Text(text = stringResource(R.string.btn_clear))
+        //attivo solo quando partita non è ancora iniziata
+        Button(
+            onClick = onStartClicked,
+            enabled = gameState == GameState.IDLE
+        ) {
+            Text(text = "Avvia partita")
         }
-        Button(onClick = { onEndGameClicked (sequence)} ) {
-            Text(text = stringResource(R.string.btn_endGame))
+
+        //attivo solo durante turno computer, testo cambia in base allo stato
+        Button(
+            onClick = onPauseResumeClicked,
+            enabled = gameState == GameState.COMPUTER_TURN || gameState == GameState.PAUSED
+        ) {
+            Text(text = if (gameState == GameState.PAUSED) "Riprendi" else "Pausa")
+        }
+
+        //attivo durante tutta la partita
+        Button(
+            onClick = onEndGameClicked,
+            enabled = gameState == GameState.COMPUTER_TURN ||
+                    gameState == GameState.PAUSED ||
+                    gameState == GameState.PLAYER_TURN
+        ) {
+            Text(text = "Fine partita")
         }
     }
 }

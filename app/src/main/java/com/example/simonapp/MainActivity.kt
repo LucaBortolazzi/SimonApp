@@ -66,12 +66,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+//rifai preview
 @Preview(showBackground = true)
-@Composable
-fun GameplayScreenPreview() {
-    SimonAppTheme {
-        GameplayScreen(
-            onEndGameClicked = {}
-        )
-    }
-}
+

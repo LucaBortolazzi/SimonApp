@@ -94,6 +94,8 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
     private fun playSequenceFrom(fromIndex: Int) {
         playbackJob?.cancel()
         playbackJob = viewModelScope.launch {
+
+            if (fromIndex == 0) delay(800)
             val seq = _computerSequence.value
             for (i in fromIndex until seq.size) {
                 pausedAtIndex = i                  //salvataggio posizione corrente
@@ -160,8 +162,8 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        //se giocatore non ha ancora premuto nulla: errore al primo elemento
-        val forcedErrorIndex = _playerSequence.value.size  //prossimo che avrebbe dovuto premere
+        //errore dopo l'ultimo elemento corretto
+        val forcedErrorIndex = _computerSequence.value.size  //prossimo che avrebbe dovuto premere
 
         //sequenza completa come stringa
         val sequenceString = seq.map { indexToChar(it) }.joinToString("")
@@ -177,6 +179,17 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
         _gameState.value = GameState.FINISHED
+    }
+
+    fun resetGame() {
+        playbackJob?.cancel()
+        _gameState.value = GameState.IDLE
+        _computerSequence.value = emptyList()
+        _playerSequence.value = emptyList()
+        _activeButton.value = -1
+        _errorIndex.value = -1
+        maxCorrectLength = 0
+        pausedAtIndex = 0
     }
 
     //salvataggio automatico dopo errore

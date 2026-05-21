@@ -23,6 +23,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,6 +54,12 @@ fun GameplayScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ){
+
+    //resetta lo stato ogni volta che si entra nella schermata
+     LaunchedEffect(Unit) {     //eseguito una sola volta
+         viewModel.resetGame()
+     }
+
     //osserva gli stati dal ViewModel
     val gameState by viewModel.gameState.collectAsState()
     val playerSequence by viewModel.playerSequence.collectAsState()

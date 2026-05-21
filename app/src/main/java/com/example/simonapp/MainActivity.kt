@@ -40,18 +40,27 @@ class MainActivity : ComponentActivity() {
                         composable("GameHistory"){
                             GameHistoryScreen(
                                 viewModel = viewModel,
-                                onStartGameClicked = { navController.navigate("Gameplay") },
-                                //da aggiungere con game detail
-                            )
+                                onStartGameClicked = {
+                                    navController.navigate("Gameplay") {
+                                        popUpTo("GameHistory") { inclusive = false }
+                                    }
+                                },
+                                onGameClicked = { gameId -> navController.navigate("GameDetail/$gameId")}
+                                    )
                         }
 
                         composable("Gameplay"){
                             GameplayScreen(
                                 viewModel = viewModel,
-                                onNavigateBack = { navController.navigate("GameHistory") }
+                                onNavigateBack = {
+                                    navController.navigate("GameHistory"){
+                                        popUpTo("GameHistory") { inclusive = true }
+                                    }
+                                }
                             )
                         }
 
+                        //passo il parametro gameId nella navigazione
                         composable("GameDetail/{gameId}"){  backStackEntry ->
                             val gameId = backStackEntry.arguments?.getString("gameId")?.toIntOrNull()
                             GameDetailScreen(
@@ -67,5 +76,4 @@ class MainActivity : ComponentActivity() {
 }
 
 //rifai preview
-@Preview(showBackground = true)
 

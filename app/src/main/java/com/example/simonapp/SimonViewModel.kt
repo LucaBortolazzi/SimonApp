@@ -22,6 +22,7 @@ enum class GameState {
     FINISHED        //partita terminata normalmente (fine partita premuto)
 }
 
+
 //utilizzo context Application di AndroidViewModel
 class SimonViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -73,11 +74,16 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
     //metodi per azioni:
 
     fun startGame() {
+        //reset completo stato precedente
+        playbackJob?.cancel()
+
         _gameState.value = GameState.COMPUTER_TURN
         _computerSequence.value = emptyList()   //azzero sequenza del computer
         _playerSequence.value = emptyList()     //azzero sequenza del player
         _errorIndex.value = -1                  //no errori
+        _activeButton.value = -1
         maxCorrectLength = 0                    //reset punteggio
+        pausedAtIndex = 0
         addNextColorAndPlay()
     }
 
@@ -100,7 +106,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
             for (i in fromIndex until seq.size) {
                 pausedAtIndex = i                  //salvataggio posizione corrente
                 _activeButton.value = seq[i]
-                delay(600)              //bottone illuminato per 600ms
+                delay(500)              //bottone illuminato per 600ms
                 _activeButton.value = -1
                 delay(300)              //pausa tra colore e l'altro
             }
@@ -134,6 +140,12 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
         val newPlayerSeq = _playerSequence.value + colorIndex
         _playerSequence.value = newPlayerSeq
 
+        _activeButton.value = colorIndex
+        viewModelScope.launch {
+            delay(100)
+            _activeButton.value = -1
+        }
+
         val pos = newPlayerSeq.size - 1  //posizione appena premuta
         val expected = _computerSequence.value[pos]
 
@@ -145,8 +157,11 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
         } else if (newPlayerSeq.size == _computerSequence.value.size) {
             //sequenza completata correttamete
             maxCorrectLength = _computerSequence.value.size
-            addNextColorAndPlay()
-            _gameState.value = GameState.COMPUTER_TURN
+            viewModelScope.launch {
+                delay(600)  // piccola pausa dopo ultimo input
+                addNextColorAndPlay()
+                _gameState.value = GameState.COMPUTER_TURN
+            }
         }
     }
 

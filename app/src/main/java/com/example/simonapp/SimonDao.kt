@@ -10,6 +10,6 @@ interface SimonDao {
     @Insert
     suspend fun insertGame(game: SimonEntity)
 
-    @Query("SELECT * FROM games")
+    @Query("SELECT * FROM games ORDER BY id DESC")      //sequenze  visualizzate tipo stack
     fun getAllGames(): Flow<List<SimonEntity>>
 }

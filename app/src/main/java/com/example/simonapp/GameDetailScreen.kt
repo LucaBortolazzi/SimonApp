@@ -46,28 +46,31 @@ fun GameDetailScreen(
                 .padding(16.dp)
         ) {
             item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 8.dp)
-                ) {
-                    //lunghezza massima sequenza corretta a sinistra
-                    Text(
-                        text = game.maxCorrectLength.toString(),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.width(50.dp)
-                    )
 
-                    //sequenza completa con parte errata in rosso a destra
-                    //mostra tutta la sequenza
-                    Text(
-                        text = buildSequenceText(game.sequence, game.errorIndex),
-                        fontSize = 20.sp,
-                        fontStyle = FontStyle.Italic,
-                        modifier = Modifier.weight(1f)
-                    )
+                Box(
+                    modifier = Modifier.fillParentMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    ) {
+
+                        Text(
+                            text = game.maxCorrectLength.toString(),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.width(50.dp)
+                        )
+
+                        Text(
+                            text = buildSequenceText(game.sequence, game.errorIndex),
+                            fontSize = 20.sp,
+                            fontStyle = FontStyle.Italic,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
         }

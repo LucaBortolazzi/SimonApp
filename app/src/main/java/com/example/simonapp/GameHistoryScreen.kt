@@ -55,18 +55,33 @@ fun GameHistoryScreen(
         }
 
         //lista partite
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.Top
         ) {
-            itemsIndexed(games) { _, game ->
-                GameHistoryItem(
-                    game = game,
-                    onClick = { onGameClicked(game.id) }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.Top
+            ) {
+                itemsIndexed(games) { _, game ->
+                    GameHistoryItem(
+                        game = game,
+                        onClick = { onGameClicked(game.id) }
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+            }
+            //scritta quando lista vuota
+            if (games.isEmpty()) {
+                Text(
+                    text = "Nessuna partita registrata",
+                    color = Color.Gray,
+                    fontSize = 18.sp,
+                    modifier = Modifier.align(Alignment.Center)
                 )
-                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }

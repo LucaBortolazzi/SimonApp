@@ -1,6 +1,7 @@
 package com.example.simonapp
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -55,18 +57,39 @@ fun GameplayScreen(
     modifier: Modifier = Modifier
 ){
 
-    //resetta lo stato ogni volta che si entra nella schermata
-     LaunchedEffect(Unit) {     //eseguito una sola volta
-         viewModel.resetGame()
-     }
-
     //osserva gli stati dal ViewModel
     val gameState by viewModel.gameState.collectAsState()
     val playerSequence by viewModel.playerSequence.collectAsState()
     val activeButton by viewModel.activeButton.collectAsState()
 
-    //ritorna configurazione corrente
-    val orientation = LocalConfiguration.current.orientation
+    //istruzioni per tasto back di sistema
+    BackHandler {
+
+        when (gameState) {
+            //se partita terminata torna alla lista
+            GameState.ERROR,
+            GameState.FINISHED -> {
+                viewModel.resetGame()   //resetta quando esco dalla schemata
+                onNavigateBack()
+            }
+
+            //si composta come bottone "Fine Partita"
+            GameState.COMPUTER_TURN,
+            GameState.PAUSED,
+            GameState.PLAYER_TURN -> {
+                viewModel.endGame()
+                viewModel.resetGame()
+                onNavigateBack()
+            }
+
+            //partita non iniziata
+            GameState.IDLE -> {
+                viewModel.resetGame()
+                onNavigateBack()
+            }
+        }
+    }
+
 
     //errore quando il giocatore sbaglia
     if (gameState == GameState.ERROR) {
@@ -75,12 +98,20 @@ fun GameplayScreen(
             title = { Text("Errore!") },
             text = { Text("Hai premuto il colore sbagliato!") },
             confirmButton = {
-                TextButton(onClick = { onNavigateBack() }) {
+                TextButton(
+                    onClick = {
+                        viewModel.resetGame()
+                        onNavigateBack()
+                    }
+                ){
                     Text("Torna alla lista")
                 }
             }
         )
     }
+
+    //ritorna configurazione corrente
+    val orientation = LocalConfiguration.current.orientation
 
     //layout in base a orientazione corrente
     if(orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -127,6 +158,7 @@ fun GameplayScreen(
                     onPauseResumeClicked = { viewModel.pauseResume() },
                     onEndGameClicked = {
                         viewModel.endGame()
+                        viewModel.resetGame()
                         onNavigateBack()
                     }
                 )
@@ -212,7 +244,15 @@ fun ColoredButton(
     val ratio = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 2.5f else 1f
 
     //feedback visivo: colore pieno se attivo, trasparente altrimenti
-    val displayColor = if (isActive) color else color.copy(alpha = 0.4f)
+    val displayColor = if (isActive) {
+        color
+    } else {
+        color.copy(
+            red = color.red * 0.75f,
+            green = color.green * 0.75f,
+            blue = color.blue * 0.75f
+        )
+    }
 
     Button(
         onClick = onClick,
@@ -221,7 +261,11 @@ fun ColoredButton(
             containerColor = displayColor,
             disabledContainerColor = displayColor   //mantieni colore anche se disabilitato
         ),
-        border = BorderStroke(1.dp, Color.LightGray),
+        border = if (isActive) {
+            BorderStroke(5.dp, MaterialTheme.colorScheme.surface)
+        } else {
+            BorderStroke(1.dp, Color.LightGray)
+        },
         shape = RoundedCornerShape(25.dp),
         modifier = modifier
             .fillMaxWidth()

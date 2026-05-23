@@ -34,8 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.simonapp.ui.theme.SimonAppTheme
 
 //colori con indice intero invece di Char per coerenza con ViewModel
 val colorList = listOf(
@@ -64,25 +66,21 @@ fun GameplayScreen(
 
     //istruzioni per tasto back di sistema
     BackHandler {
-
         when (gameState) {
-            //se partita terminata torna alla lista
             GameState.ERROR,
             GameState.FINISHED -> {
-                viewModel.resetGame()   //resetta quando esco dalla schemata
-                onNavigateBack()
-            }
-
-            //si composta come bottone "Fine Partita"
-            GameState.COMPUTER_TURN,
-            GameState.PAUSED,
-            GameState.PLAYER_TURN -> {
-                viewModel.endGame()
                 viewModel.resetGame()
                 onNavigateBack()
             }
 
-            //partita non iniziata
+            GameState.COMPUTER_TURN,
+            GameState.PAUSED,
+            GameState.PLAYER_TURN -> {
+                viewModel.endGame()     // salva nel DB (coroutine interna)
+                viewModel.resetGame()
+                onNavigateBack()
+            }
+
             GameState.IDLE -> {
                 viewModel.resetGame()
                 onNavigateBack()
@@ -94,7 +92,10 @@ fun GameplayScreen(
     //errore quando il giocatore sbaglia
     if (gameState == GameState.ERROR) {
         AlertDialog(
-            onDismissRequest = {},
+            onDismissRequest = {
+                viewModel.resetGame()
+                onNavigateBack()
+            },
             title = { Text("Errore!") },
             text = { Text("Hai premuto il colore sbagliato!") },
             confirmButton = {
@@ -128,12 +129,12 @@ fun GameplayScreen(
                 //bottoni premibili solo durante turno del giocatore
                 enabled = gameState == GameState.PLAYER_TURN,
                 modifier = Modifier
-                    .weight(1.5f)   //60% dello schermo
+                    .weight(1f)   //50% dello schermo
                     .fillMaxHeight()
             )
             Column(
                 modifier = Modifier
-                    .weight(1f)     //40% rimanente dello schermo
+                    .weight(1f)     //50% rimanente
                     .fillMaxHeight()
                     .padding(8.dp)
             ){
@@ -197,6 +198,7 @@ fun GameplayScreen(
                 onPauseResumeClicked = { viewModel.pauseResume() },
                 onEndGameClicked = {
                     viewModel.endGame()
+                    viewModel.resetGame()
                     onNavigateBack()
                 }
             )
@@ -347,6 +349,35 @@ fun ButtonsRow(
                     gameState == GameState.PLAYER_TURN
         ) {
             Text(text = "Fine partita")
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GameplayScreenPreview() {
+    SimonAppTheme {
+        Column(modifier = Modifier.fillMaxSize()) {
+            ColorsGrid(
+                activeButton = 3,
+                onButtonPressed = {},
+                enabled = true,
+                modifier = Modifier
+                    .weight(2f)
+                    .fillMaxWidth()
+            )
+            SequenceLetter(
+                gameState = GameState.PLAYER_TURN,
+                playerSequence = listOf(0, 2, 4),
+                modifier = Modifier.weight(0.4f)
+            )
+            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+            ButtonsRow(
+                gameState = GameState.IDLE,
+                onStartClicked = {},
+                onPauseResumeClicked = {},
+                onEndGameClicked = {}
+            )
         }
     }
 }

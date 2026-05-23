@@ -65,6 +65,9 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
     //riferimento coroutine di sequenza del computer
     private var playbackJob: Job? = null
 
+    private var playerInputJob: Job? = null
+    private var gameActive = false
+
     //indice per pausa
     private var pausedAtIndex = 0
 
@@ -76,6 +79,8 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
     fun startGame() {
         //reset completo stato precedente
         playbackJob?.cancel()
+        playerInputJob?.cancel()
+        gameActive = true
 
         _gameState.value = GameState.COMPUTER_TURN
         _computerSequence.value = emptyList()   //azzero sequenza del computer
@@ -104,6 +109,9 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
             if (fromIndex == 0) delay(800)
             val seq = _computerSequence.value
             for (i in fromIndex until seq.size) {
+                if (!gameActive) {
+                    return@launch
+                }
                 pausedAtIndex = i                  //salvataggio posizione corrente
                 _activeButton.value = seq[i]
                 delay(500)              //bottone illuminato per 600ms
@@ -111,7 +119,9 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
                 delay(300)              //pausa tra colore e l'altro
             }
             //turno giocatore
-            _gameState.value = GameState.PLAYER_TURN
+            if (gameActive) {
+                _gameState.value = GameState.PLAYER_TURN
+            }
             pausedAtIndex = seq.size   //reset
         }
     }
@@ -157,17 +167,22 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
         } else if (newPlayerSeq.size == _computerSequence.value.size) {
             //sequenza completata correttamete
             maxCorrectLength = _computerSequence.value.size
-            viewModelScope.launch {
-                delay(600)  // piccola pausa dopo ultimo input
-                addNextColorAndPlay()
-                _gameState.value = GameState.COMPUTER_TURN
+            playerInputJob?.cancel()
+            playerInputJob = viewModelScope.launch {
+                delay(600)
+                if (gameActive) {  // usa gameActive invece di controllare gameState
+                    _gameState.value = GameState.COMPUTER_TURN
+                    addNextColorAndPlay()
+                }
             }
         }
     }
 
     //quando giocatore preme "Fine Partita"
     fun endGame() {
+        gameActive = false
         playbackJob?.cancel()
+        playerInputJob?.cancel()
         _activeButton.value = -1
         val seq = _computerSequence.value
 
@@ -178,26 +193,32 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         //errore dopo l'ultimo elemento corretto
-        val forcedErrorIndex = _computerSequence.value.size  //prossimo che avrebbe dovuto premere
+        val forcedErrorIndex = _playerSequence.value.size
 
         //sequenza completa come stringa
         val sequenceString = seq.map { indexToChar(it) }.joinToString("")
+
+        val errorIdx = if (_errorIndex.value >= 0) _errorIndex.value else forcedErrorIndex
+        val maxCorrect = maxCorrectLength
+
+        _gameState.value = GameState.FINISHED
 
         viewModelScope.launch {
             repository.insertGame(
                 SimonEntity(
                     id = 0,  // autoGenerate
                     sequence = sequenceString,
-                    errorIndex = if (_errorIndex.value >= 0) _errorIndex.value else forcedErrorIndex,
-                    maxCorrectLength = maxCorrectLength
+                    errorIndex = errorIdx,
+                    maxCorrectLength = maxCorrect
                 )
             )
         }
-        _gameState.value = GameState.FINISHED
     }
 
     fun resetGame() {
+        gameActive = false
         playbackJob?.cancel()
+        playerInputJob?.cancel()
         _gameState.value = GameState.IDLE
         _computerSequence.value = emptyList()
         _playerSequence.value = emptyList()

@@ -78,7 +78,7 @@ fun GameplayScreen(
             GameState.COMPUTER_TURN,
             GameState.PAUSED,
             GameState.PLAYER_TURN -> {
-                viewModel.endGame()     // salva nel DB (coroutine interna)
+                viewModel.endGame()     //salva nel DB
                 viewModel.resetGame()
                 onNavigateBack()
             }
@@ -91,7 +91,7 @@ fun GameplayScreen(
     }
 
 
-    //errore quando il giocatore sbaglia
+    //errore quando il  giocatore sbaglia
     if (gameState == GameState.ERROR) {
         AlertDialog(
             onDismissRequest = {
@@ -181,7 +181,7 @@ fun GameplayScreen(
                 onButtonPressed = { index -> viewModel.onPlayerInput(index) },
                 enabled = gameState == GameState.PLAYER_TURN,
                 modifier = Modifier
-                    .weight(2f)     //80% schermo
+                    .weight(2f)     //circa 80% schermo
                     .fillMaxWidth()
             )
 
@@ -190,7 +190,7 @@ fun GameplayScreen(
             SequenceLetter(
                 gameState = gameState,
                 playerSequence = playerSequence,
-                modifier = Modifier.weight(0.35f)    //20% schermo
+                modifier = Modifier.weight(0.35f)    //circa 20% schermo
             )
 
             HorizontalDivider(
@@ -270,9 +270,9 @@ fun ColoredButton(
             disabledContainerColor = displayColor   //mantieni colore anche se disabilitato
         ),
         border = if (isActive) {
-            BorderStroke(5.dp, MaterialTheme.colorScheme.surface)
+            BorderStroke(6.dp, MaterialTheme.colorScheme.surface)
         } else {
-            BorderStroke(1.dp, Color.LightGray)
+            BorderStroke(3.dp, Color.LightGray)
         },
         shape = RoundedCornerShape(25.dp),
         modifier = modifier

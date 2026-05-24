@@ -1,6 +1,6 @@
 # Simon App
 
-Prototipo del gioco **Simon** realizzato in Android con Jetpack Compose.
+Prototipo del gioco **Simon** realizzato in Android con Jetpack Compose
 
 ---
 
@@ -18,16 +18,42 @@ Prototipo del gioco **Simon** realizzato in Android con Jetpack Compose.
 
 ## Funzionalità implementate
 
-- **Schermata 1 — GameplayScreen**
-    - Griglia 3×2 di rettangoli colorati (R, G, B, M, Y, C)
-    - Area di testo con la sequenza di colori premuti
-    - Pulsante *Cancella* per azzerare sequenza corrente
-    - Pulsante *Fine partita* per salvare sequenza e passare alla schermata 2
-    - Layout adattivo portrait e landscape
+- **Lista delle Partite — GameHistoryScreen**
+    - Lista dinamica delle partite concluse, persistente anche dopo chiusura o riavvio
+    - Per ogni partita: lunghezza massima della sequenza repllicata correttamente e sequenza 
+  completa con parte errata evidenziata in rosso
+    - Click su una partita per vedere il dettaglio completo
+    - Pulsante *Nuova partita* per avviare una sessione di gioco
 
-- **Schermata 2 — GameHistoryScreen**
-    - Lista dinamica delle partite concluse
-    - Per ogni partita: numero di colori premuti e sequenza
+- **Dettaglio Partita — GameDetailScreen**
+    - Visualizzazione della partita selezionata con più spazio
+    - Uscita con tasto Back di sistema
+
+- **Schermata di Gioco — GameplayScreen**
+    - Griglia 3×2 di rettangoli colorati (R, G, B, M, Y, C)
+    - Logica completa del gioco Simon: il computer propone una sequenza crescente, 
+  il giocatore deve replicarla
+    - Feedback visivo sui rettangoli (illuminazione e modifica bordi)
+    - Feedback uditivo con note musicali diverse per ogni colore
+    - Area di testo con la sequenza di colori premuti
+    - Indicatore del turno corrente (computer / giocatore / pausa)
+    - Pulsante *Avvia partita*, *Pausa/Riprendi*, *Fine partita*
+    - Dialogo di erore quando il giocatore preme il colore sbagliato
+    - Stato della partita preservato durante cambi di configurazione (portrait/landscape)
+
+- **Database**
+    - Persistenza delle partite con Room su SQLite
+    - Le partite rimangono salvate anche dopo chiusura o riavvio del dispositivo
+
+---
+
+## Architettura
+
+- **Pattern**: MVVM (Model-View-ViewModel)
+- **UI**: Jetpack Compose
+- **Navigazione**: Navigation Compose
+- **Database**: Room con KSP
+- **Stato**: ViewModel + StateFlow
 
 ---
 
@@ -40,6 +66,6 @@ Prototipo del gioco **Simon** realizzato in Android con Jetpack Compose.
 
 ## Note
 
-Ho notato solo dopo parecchi commit di aver utilizzato un account 
-GitHub diverso da quello usato nel commit iniziale. Entrambi sono
-miei account: uno privato e uno istituzionale.
+Ho notato solo dopo parecchi commit di aver utilizzato un account GitHub diverso
+da quello usato nel commit iniziale. Entrambi sono miei account: uno privato
+e uno istituzionale

@@ -12,6 +12,7 @@ private val noteResources = listOf(
     R.raw.a4
 )
 
+//istanza singla riutilizzata per tutte le note
 private var currentPlayer: MediaPlayer? = null
 
 fun playTone(context: Context, colorIndex: Int) {

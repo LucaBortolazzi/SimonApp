@@ -39,7 +39,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
 
 
     //_variabile: modificabile solo da viewModel
-    // variabile: solo leggibile da UI
+    //variabile: solo leggibile da UI
     //stati del gioco:
     private val _gameState = MutableStateFlow(GameState.IDLE)
     val gameState: StateFlow<GameState> = _gameState
@@ -155,7 +155,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
         _activeButton.value = colorIndex
         playTone(appContext, colorIndex)
         viewModelScope.launch {
-            delay(80)
+            delay(40)
             _activeButton.value = -1
         }
 
@@ -173,7 +173,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
             playerInputJob?.cancel()
             playerInputJob = viewModelScope.launch {
                 delay(600)
-                if (gameActive) {  // usa gameActive invece di controllare gameState
+                if (gameActive) {       //gameActive invece di controllare gameState
                     _gameState.value = GameState.COMPUTER_TURN
                     addNextColorAndPlay()
                 }
@@ -209,7 +209,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.insertGame(
                 SimonEntity(
-                    id = 0,  // autoGenerate
+                    id = 0,
                     sequence = sequenceString,
                     errorIndex = errorIdx,
                     maxCorrectLength = maxCorrect

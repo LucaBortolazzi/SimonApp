@@ -1,5 +1,15 @@
 <resources>
     <string name="app_name">SimonApp</string>
-    <string name="btn_clear">Clear</string>
-    <string name="btn_endGame">End game</string>
+    <string name="btn_start">Start game</string>
+    <string name="btn_pause">Pause</string>
+    <string name="btn_resume">Resume</string>
+    <string name="btn_end_game">End game</string>
+    <string name="error_title">Error!</string>
+    <string name="error_message">You pressed the wrong color!</string>
+    <string name="btn_back_to_list">Back to list</string>
+    <string name="turn_computer">Computer\'s turn…</string>
+    <string name="turn_player">Your turn!</string>
+    <string name="turn_paused">Paused</string>
+    <string name="btn_new_game">New game</string>
+    <string name="empty_list">No games recorded</string>string>
 </resources>

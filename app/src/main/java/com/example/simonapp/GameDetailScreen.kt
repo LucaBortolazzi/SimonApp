@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun GameDetailScreen(
@@ -36,7 +37,7 @@ fun GameDetailScreen(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Partita non trovata")
+            Text(text = stringResource(R.string.empty_list))
         }
     } else {
         //si esce con tasto Back di sistema

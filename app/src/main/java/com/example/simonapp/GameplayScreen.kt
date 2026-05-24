@@ -32,6 +32,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -96,8 +98,8 @@ fun GameplayScreen(
                 viewModel.resetGame()
                 onNavigateBack()
             },
-            title = { Text("Errore!") },
-            text = { Text("Hai premuto il colore sbagliato!") },
+            title = { Text(stringResource(R.string.error_title)) },
+            text = { Text(stringResource(R.string.error_message)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -105,7 +107,7 @@ fun GameplayScreen(
                         onNavigateBack()
                     }
                 ){
-                    Text("Torna alla lista")
+                    Text(stringResource(R.string.btn_back_to_list))
                 }
             }
         )
@@ -129,17 +131,19 @@ fun GameplayScreen(
                 //bottoni premibili solo durante turno del giocatore
                 enabled = gameState == GameState.PLAYER_TURN,
                 modifier = Modifier
-                    .weight(1f)   //50% dello schermo
+                    .weight(1.2f)   //55% dello schermo
                     .fillMaxHeight()
             )
             Column(
                 modifier = Modifier
-                    .weight(1f)     //50% rimanente
+                    .weight(1f)     //45% rimanente
                     .fillMaxHeight()
                     .padding(8.dp)
             ){
                 //margine superiore
                 Spacer(modifier = Modifier.height(40.dp))
+
+                TurnIndicator(gameState = gameState)
 
                 SequenceLetter(
                     gameState = gameState,
@@ -181,10 +185,12 @@ fun GameplayScreen(
                     .fillMaxWidth()
             )
 
+            TurnIndicator(gameState = gameState)
+
             SequenceLetter(
                 gameState = gameState,
                 playerSequence = playerSequence,
-                modifier = Modifier.weight(0.4f)    //20% schermo
+                modifier = Modifier.weight(0.35f)    //20% schermo
             )
 
             HorizontalDivider(
@@ -330,7 +336,7 @@ fun ButtonsRow(
             onClick = onStartClicked,
             enabled = gameState == GameState.IDLE
         ) {
-            Text(text = "Avvia partita")
+            Text(text = stringResource(R.string.btn_start))
         }
 
         //attivo solo durante turno computer, testo cambia in base allo stato
@@ -338,7 +344,8 @@ fun ButtonsRow(
             onClick = onPauseResumeClicked,
             enabled = gameState == GameState.COMPUTER_TURN || gameState == GameState.PAUSED
         ) {
-            Text(text = if (gameState == GameState.PAUSED) "Riprendi" else "Pausa")
+            Text(text = if (gameState == GameState.PAUSED)
+                stringResource(R.string.btn_resume) else stringResource(R.string.btn_pause))
         }
 
         //attivo durante tutta la partita
@@ -348,9 +355,37 @@ fun ButtonsRow(
                     gameState == GameState.PAUSED ||
                     gameState == GameState.PLAYER_TURN
         ) {
-            Text(text = "Fine partita")
+            Text(text = stringResource(R.string.btn_end_game))
         }
     }
+}
+
+@Composable
+fun TurnIndicator(gameState: GameState) {   //indica se turno computer o player o pausa
+
+    val text = when (gameState) {
+
+        GameState.COMPUTER_TURN -> stringResource(R.string.turn_computer)
+        GameState.PLAYER_TURN -> stringResource(R.string.turn_player)
+        GameState.PAUSED -> stringResource(R.string.turn_paused)
+        else -> ""
+    }
+
+    Text(
+        text = text,
+        fontSize = 16.sp,
+        fontStyle = FontStyle.Italic,
+        textAlign = TextAlign.Center,
+        color = when(gameState) {
+            GameState.PLAYER_TURN -> Color(0xFF2E7D32)
+            GameState.COMPUTER_TURN -> Color(0xFFB00020)
+            GameState.PAUSED -> Color.Gray
+            else -> Color.Gray
+        },
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    )
 }
 
 @Preview(showBackground = true)
@@ -365,6 +400,9 @@ fun GameplayScreenPreview() {
                 modifier = Modifier
                     .weight(2f)
                     .fillMaxWidth()
+            )
+            TurnIndicator(
+                gameState = GameState.PLAYER_TURN
             )
             SequenceLetter(
                 gameState = GameState.PLAYER_TURN,

@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 //indici dei 6 colori 0=R, 1=G, 2=B, 3=M, 4=Y, 5=C
-
 enum class GameState {
     IDLE,           //partita non ancora iniziata
     COMPUTER_TURN,  //il computer mostra sequenza
@@ -25,6 +24,8 @@ enum class GameState {
 
 //utilizzo context Application di AndroidViewModel
 class SimonViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val appContext = application.applicationContext
 
     private val repository = SimonRepository(
         SimonDatabase.getDatabase(application).simonDao()
@@ -114,7 +115,8 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 pausedAtIndex = i                  //salvataggio posizione corrente
                 _activeButton.value = seq[i]
-                delay(500)              //bottone illuminato per 600ms
+                playTone(appContext, seq[i])       //suono associato a bottone i-esimo
+                delay(500)              //bottone illuminato per 500ms
                 _activeButton.value = -1
                 delay(300)              //pausa tra colore e l'altro
             }
@@ -151,8 +153,9 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
         _playerSequence.value = newPlayerSeq
 
         _activeButton.value = colorIndex
+        playTone(appContext, colorIndex)
         viewModelScope.launch {
-            delay(100)
+            delay(80)
             _activeButton.value = -1
         }
 

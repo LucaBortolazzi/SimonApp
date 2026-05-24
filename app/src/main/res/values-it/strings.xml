@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SimonApp</string>
-    <string name="btn_clear">Cancella</string>
-    <string name="btn_endGame">Fine partita</string>
+    <string name="btn_start">Avvia partita</string>
+    <string name="btn_pause">Pausa</string>
+    <string name="btn_resume">Riprendi</string>
+    <string name="btn_end_game">Fine partita</string>
+    <string name="error_title">Errore!</string>
+    <string name="error_message">Hai premuto il colore sbagliato!</string>
+    <string name="btn_back_to_list">Torna alla lista</string>
+    <string name="turn_computer">Turno del computer…</string>
+    <string name="turn_player">Tocca a te!</string>
+    <string name="turn_paused">Pausa</string>
+    <string name="btn_new_game">Nuova partita</string>
+    <string name="empty_list">Nessuna partita registrata</string>string>
 </resources>

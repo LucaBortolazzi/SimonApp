@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -50,7 +51,7 @@ fun GameHistoryScreen(
             contentAlignment = Alignment.CenterEnd
         ) {
             Button(onClick = onStartGameClicked) {
-                Text(text = "Nuova partita")
+                Text(text = stringResource(R.string.btn_new_game))
             }
         }
 
@@ -77,7 +78,7 @@ fun GameHistoryScreen(
             //scritta quando lista vuota
             if (games.isEmpty()) {
                 Text(
-                    text = "Nessuna partita registrata",
+                    text = stringResource(R.string.empty_list),
                     color = Color.Gray,
                     fontSize = 18.sp,
                     modifier = Modifier.align(Alignment.Center)
@@ -111,7 +112,7 @@ fun GameHistoryItem(
         //a destra sequenza con parte errata in rosso
         Text(
             text = buildSequenceText(game.sequence, game.errorIndex),
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontStyle = FontStyle.Italic,
             modifier = Modifier.weight(1f),
             maxLines = 1,                       //massimo 1 riga per sequenza

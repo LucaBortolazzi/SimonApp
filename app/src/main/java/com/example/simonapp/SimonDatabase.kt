@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [SimonEntity::class], version = 1, exportSchema = false)
-public abstract class SimonDatabase : RoomDatabase() {
+abstract class SimonDatabase : RoomDatabase() {
     abstract fun simonDao(): SimonDao
 
     companion object {

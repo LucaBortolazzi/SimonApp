@@ -46,7 +46,6 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
 
     //sequenza generata dal computer (lista indici che rappresentano un colore)
     private val _computerSequence = MutableStateFlow<List<Int>>(emptyList())
-    val computerSequence: StateFlow<List<Int>> = _computerSequence
 
     //sequenza premuta dal giocatore (stessa struttura di computerSequence)
     private val _playerSequence = MutableStateFlow<List<Int>>(emptyList())
@@ -58,7 +57,6 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
 
     //indice primo errore nella sequenza (default: -1)
     private val _errorIndex = MutableStateFlow<Int>(-1)
-    val errorIndex: StateFlow<Int> = _errorIndex
 
     //lunghezza massima sequenza corrretta
     private var maxCorrectLength = 0
@@ -96,7 +94,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
     //aggiunge colore casuale a sequenza e avvia riproduzione
     private fun addNextColorAndPlay() {
         val next = (0..5).random()      //colore casuale poi metto in coda
-        _computerSequence.value = _computerSequence.value + next
+        _computerSequence.value += next
         _playerSequence.value = emptyList()
         pausedAtIndex = 0
         playSequenceFrom(0)

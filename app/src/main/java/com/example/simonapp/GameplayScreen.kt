@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -180,7 +181,7 @@ fun GameplayScreen(
                 onButtonPressed = { index -> viewModel.onPlayerInput(index) },
                 enabled = gameState == GameState.PLAYER_TURN,
                 modifier = Modifier
-                    .weight(2f)     //circa 80% schermo
+                    .weight(3f)
                     .fillMaxWidth()
             )
 
@@ -189,7 +190,9 @@ fun GameplayScreen(
             SequenceLetter(
                 gameState = gameState,
                 playerSequence = playerSequence,
-                modifier = Modifier.weight(0.35f)    //circa 20% schermo
+                modifier = Modifier
+                    .weight(0.5f)
+                    .fillMaxWidth()
             )
 
             HorizontalDivider(
@@ -221,7 +224,7 @@ fun ColorsGrid(
 ){
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),   //6 elementi
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
     ){
         items(colorList){ (index, color) ->    //pair indice, colore
             ColoredButton(

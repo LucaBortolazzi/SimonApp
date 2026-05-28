@@ -70,6 +70,9 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
     //indice per pausa
     private var pausedAtIndex = 0
 
+    //per evitare doppio input del giocatore e successivo crash
+    private var isProcessingInput = false
+
 
 
 
@@ -146,6 +149,11 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
     //quando giocatore preme un bottone
     fun onPlayerInput(colorIndex: Int) {
         if (_gameState.value != GameState.PLAYER_TURN) return   //ritorna se non è turno giusto
+        if (isProcessingInput) return                           //blocca doppio tap
+        val currentPos = _playerSequence.value.size
+        if (currentPos >= _computerSequence.value.size) return
+
+        isProcessingInput = true
 
         val newPlayerSeq = _playerSequence.value + colorIndex
         _playerSequence.value = newPlayerSeq
@@ -155,6 +163,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             delay(40)
             _activeButton.value = -1
+            isProcessingInput = false   //rilascia dopo il feedback visivo
         }
 
         val pos = newPlayerSeq.size - 1  //posizione appena premuta
@@ -164,6 +173,7 @@ class SimonViewModel(application: Application) : AndroidViewModel(application) {
             //l'indice errore è nella sequenza completa del computer
             _errorIndex.value = pos
             _gameState.value = GameState.ERROR
+            isProcessingInput = false
             saveGame()
         } else if (newPlayerSeq.size == _computerSequence.value.size) {
             //sequenza completata correttamete

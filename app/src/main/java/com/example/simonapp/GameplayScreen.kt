@@ -131,12 +131,12 @@ fun GameplayScreen(
                 //bottoni premibili solo durante turno del giocatore
                 enabled = gameState == GameState.PLAYER_TURN,
                 modifier = Modifier
-                    .weight(1.2f)   //55% dello schermo
+                    .weight(1f)   //50% dello schermo
                     .fillMaxHeight()
             )
             Column(
                 modifier = Modifier
-                    .weight(1f)     //45% rimanente
+                    .weight(1f)     //50% rimanente
                     .fillMaxHeight()
                     .padding(8.dp)
             ){
@@ -181,7 +181,7 @@ fun GameplayScreen(
                 onButtonPressed = { index -> viewModel.onPlayerInput(index) },
                 enabled = gameState == GameState.PLAYER_TURN,
                 modifier = Modifier
-                    .weight(3f)
+                    .weight(7f)
                     .fillMaxWidth()
             )
 
@@ -191,7 +191,7 @@ fun GameplayScreen(
                 gameState = gameState,
                 playerSequence = playerSequence,
                 modifier = Modifier
-                    .weight(0.5f)
+                    .weight(2f)
                     .fillMaxWidth()
             )
 
@@ -222,18 +222,23 @@ fun ColorsGrid(
     enabled: Boolean,
     modifier: Modifier = Modifier
 ){
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),   //6 elementi
-        modifier = modifier
-    ){
-        items(colorList){ (index, color) ->    //pair indice, colore
-            ColoredButton(
-                index = index,
-                color = color,
-                isActive = activeButton == index,
-                onClick = { onButtonPressed(index) },
-                enabled = enabled
-            )
+    //per rendere i bottoni adatti ad ogni schermo ho rimosso lazyVerticalGrid
+    //e l'ho sostituito con row e column che rispettano i vincoli di altezza
+    Column(modifier = modifier) {
+        colorList.chunked(2).forEach { row ->
+            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                row.forEach { (index, color) ->
+
+                    ColoredButton(
+                        index = index,
+                        color = color,
+                        isActive = activeButton == index,
+                        onClick = { onButtonPressed(index) },
+                        enabled = enabled,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
         }
     }
 }
@@ -278,9 +283,9 @@ fun ColoredButton(
         },
         shape = RoundedCornerShape(25.dp),
         modifier = modifier
-            .fillMaxWidth()
             .padding(6.dp)
-            .aspectRatio(ratio)
+            .fillMaxHeight()
+        
     ){
         Text(
             text = colorLabels[index],   //serve string per Text
@@ -400,7 +405,7 @@ fun GameplayScreenPreview() {
                 onButtonPressed = {},
                 enabled = true,
                 modifier = Modifier
-                    .weight(2f)
+                    .weight(3f)
                     .fillMaxWidth()
             )
             TurnIndicator(
@@ -409,7 +414,7 @@ fun GameplayScreenPreview() {
             SequenceLetter(
                 gameState = GameState.PLAYER_TURN,
                 playerSequence = listOf(0, 2, 4),
-                modifier = Modifier.weight(0.4f)
+                modifier = Modifier.weight(1f)
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
             ButtonsRow(
